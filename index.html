@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f4f1e9" />
+    <meta name="description" content="Wapas remembers everything you lend and borrow, and when it should come back." />
+    <title>Wapas — Things find their way back</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&family=Newsreader:ital,wght@1,500&display=swap" rel="stylesheet" />
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Wapas home">
+          <span class="brand-mark" aria-hidden="true">↩</span>
+          <span>Wapas</span>
+        </a>
+        <nav class="main-nav" aria-label="Main views">
+          <button class="nav-button active" data-view="items" type="button">Open items</button>
+          <button class="nav-button" data-view="people" type="button">People</button>
+          <button class="nav-button" data-view="history" type="button">History</button>
+        </nav>
+        <div class="top-actions">
+          <button class="icon-button" id="backupButton" type="button" aria-label="Backup and restore" title="Backup and restore">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 15v4h14v-4"/></svg>
+          </button>
+          <button class="primary-button" id="addButton" type="button"><span>＋</span> Add item</button>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero">
+          <div class="hero-copy-block">
+            <p class="eyebrow">YOUR BORROWED-THINGS LEDGER</p>
+            <h1>Things find their<br /><em>way back.</em></h1>
+            <p class="hero-copy">Remember what left, who has it, and when it should return.</p>
+          </div>
+          <div class="hero-stamp" aria-hidden="true"><span>ALL<br />ACCOUNTED<br />FOR</span><b>✓</b></div>
+        </section>
+
+        <section class="summary-grid" aria-label="Item summary">
+          <article class="summary-card summary-featured">
+            <div class="summary-top"><span class="summary-icon">↗</span><span>Currently lent out</span></div>
+            <strong id="lentCount">0</strong>
+            <p id="lentCaption">Nothing is away</p>
+            <div class="mini-avatars" id="lentAvatars"></div>
+          </article>
+          <article class="summary-card">
+            <div class="summary-top"><span class="summary-icon borrowed-icon">↙</span><span>You borrowed</span></div>
+            <strong id="borrowedCount">0</strong>
+            <p id="borrowedCaption">Nothing to return</p>
+          </article>
+          <article class="summary-card">
+            <div class="summary-top"><span class="summary-icon overdue-icon">!</span><span>Overdue</span></div>
+            <strong class="overdue-value" id="overdueCount">0</strong>
+            <p id="overdueCaption">All on schedule</p>
+          </article>
+          <article class="summary-card">
+            <div class="summary-top"><span class="summary-icon returned-icon">✓</span><span>Returned this month</span></div>
+            <strong id="returnedCount">0</strong>
+            <p>Safely back where they belong</p>
+          </article>
+        </section>
+
+        <section class="workspace">
+          <div class="workspace-heading">
+            <div>
+              <p class="eyebrow" id="viewEyebrow">STILL OUT THERE</p>
+              <h2 id="viewTitle">Open items</h2>
+            </div>
+            <div class="workspace-tools">
+              <label class="search-box">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+                <input id="searchInput" type="search" placeholder="Search item or person" autocomplete="off" />
+              </label>
+              <select id="filterSelect" aria-label="Filter items">
+                <option value="all">All open</option>
+                <option value="lent">I lent</option>
+                <option value="borrowed">I borrowed</option>
+                <option value="overdue">Overdue</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="items-grid" id="itemsGrid"></div>
+          <div class="people-grid" id="peopleGrid"></div>
+          <div class="history-table" id="historyTable"></div>
+
+          <div class="empty-state" id="emptyState">
+            <span class="empty-mark">↩</span>
+            <h3>Everything is home</h3>
+            <p>Add something when you lend it or borrow it.</p>
+            <button id="emptyAddButton" type="button">Add your first item</button>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <div class="brand footer-brand"><span class="brand-mark">↩</span><span>Wapas</span></div>
+        <p>Private by design. Your ledger stays in this browser.</p>
+        <button id="footerBackupButton" type="button">Back up your ledger →</button>
+      </footer>
+    </div>
+
+    <button class="mobile-add" id="mobileAdd" type="button" aria-label="Add item">＋</button>
+
+    <dialog class="app-dialog" id="itemDialog">
+      <form class="dialog-card" id="itemForm">
+        <div class="dialog-header">
+          <div><p class="eyebrow" id="dialogEyebrow">NEW ENTRY</p><h2 id="dialogTitle">What changed hands?</h2></div>
+          <button class="close-button" id="closeDialog" type="button" aria-label="Close">×</button>
+        </div>
+        <input id="entryId" type="hidden" />
+
+        <fieldset class="direction-field">
+          <legend>Which way did it go?</legend>
+          <div class="direction-options">
+            <label><input type="radio" name="direction" value="lent" checked /><span><b>I lent it</b><small>Someone has your item</small></span></label>
+            <label><input type="radio" name="direction" value="borrowed" /><span><b>I borrowed it</b><small>You need to return it</small></span></label>
+          </div>
+        </fieldset>
+
+        <div class="form-row">
+          <label class="field"><span>Item</span><input id="itemName" type="text" maxlength="80" placeholder="Book, charger, document…" required /></label>
+          <label class="field"><span>Person</span><input id="personName" type="text" maxlength="60" placeholder="Who is it with?" required /></label>
+        </div>
+        <div class="form-row">
+          <label class="field"><span>Changed hands on</span><input id="startDate" type="date" required /></label>
+          <label class="field"><span>Expected back <small>(optional)</small></span><input id="dueDate" type="date" /></label>
+        </div>
+        <div class="form-row">
+          <label class="field"><span>Category</span>
+            <select id="category"><option value="book">Book</option><option value="gadget">Gadget</option><option value="document">Document</option><option value="tool">Tool</option><option value="clothing">Clothing</option><option value="other">Other</option></select>
+          </label>
+          <label class="field"><span>Approx. value <small>(optional)</small></span><div class="money-input"><span>₹</span><input id="itemValue" type="number" min="0" step="1" placeholder="0" /></div></label>
+        </div>
+        <label class="field"><span>Note <small>(optional)</small></span><textarea id="notes" rows="3" maxlength="240" placeholder="Condition, where to return it, or anything useful…"></textarea></label>
+
+        <div class="dialog-actions">
+          <button class="delete-button" id="deleteButton" type="button">Delete</button>
+          <span></span>
+          <button class="secondary-button" id="cancelButton" type="button">Cancel</button>
+          <button class="primary-button" type="submit">Save entry</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="app-dialog" id="returnDialog">
+      <form class="dialog-card compact-card" id="returnForm">
+        <div class="dialog-header">
+          <div><p class="eyebrow">COMING HOME</p><h2>Mark as returned</h2></div>
+          <button class="close-button" id="closeReturnDialog" type="button" aria-label="Close">×</button>
+        </div>
+        <input id="returnId" type="hidden" />
+        <p class="return-copy" id="returnCopy"></p>
+        <label class="field"><span>Return date</span><input id="returnDate" type="date" required /></label>
+        <label class="field"><span>Return note <small>(optional)</small></span><input id="returnNote" type="text" maxlength="120" placeholder="Returned in good condition" /></label>
+        <div class="dialog-actions simple-actions"><button class="secondary-button" id="cancelReturnButton" type="button">Cancel</button><button class="primary-button" type="submit">Confirm return</button></div>
+      </form>
+    </dialog>
+
+    <dialog class="app-dialog" id="backupDialog">
+      <div class="dialog-card compact-card">
+        <div class="dialog-header">
+          <div><p class="eyebrow">YOUR DATA</p><h2>Backup & restore</h2></div>
+          <button class="close-button" id="closeBackupDialog" type="button" aria-label="Close">×</button>
+        </div>
+        <p class="dialog-copy">Download a copy before clearing browser data or moving to another device.</p>
+        <button class="primary-button full-button" id="exportButton" type="button">Download backup</button>
+        <label class="secondary-button full-button file-button">Restore from backup<input id="importInput" type="file" accept="application/json,.json" /></label>
+        <p class="import-message" id="importMessage" role="status"></p>
+      </div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
